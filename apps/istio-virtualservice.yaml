@@ -5,49 +5,66 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-    - '*'
+    - '*' # 게이트웨이와 동일하게 "*"
   gateways:
-    - istio-ingressgateway
+    - istio-ingressgateway # 만든 Gateway
   http:
-    - match:
+    - name: route-to-nginx
+      match:
         - uri:
-            prefix: /frontend
-      route:
-        - destination:
-            host: frontend.default.svc.cluster.local
-            port:
-              number: 5173
-    - match:
-        - uri:
-            prefix: /backend
-      route:
-        - destination:
-            host: backend.default.svc.cluster.local
-            port:
-              number: 8000
-    - match:
-        - uri:
-            prefix: /nginx
+            prefix: '/nginx'
+      rewrite:
+        uri: '/' # 내부로 보낼 때는 "/"로 rewrite
       route:
         - destination:
             host: nginx.default.svc.cluster.local
             port:
-              number: 80
-    - match:
+              number: 80 # nginx 서비스의 port
+
+    - name: route-to-frontend
+      match:
         - uri:
-            prefix: /kiali
+            prefix: '/frontend'
       rewrite:
-        uri: /kiali # Kiali 기본 web_root 경로
+        uri: '/'
+      route:
+        - destination:
+            host: frontend.default.svc.cluster.local
+            port:
+              number: 5173 # frontend 서비스의 port
+
+    - name: route-to-backend
+      match:
+        - uri:
+            prefix: '/backend'
+      rewrite:
+        uri: '/'
+      route:
+        - destination:
+            host: backend.default.svc.cluster.local
+            port:
+              number: 8000 # backend 서비스의 port
+
+    # Kiali (보통 istio-system 네임스페이스, 포트 20001)
+    - name: route-to-kiali
+      match:
+        - uri:
+            prefix: '/kiali'
+      rewrite:
+        uri: '/'
       route:
         - destination:
             host: kiali.istio-system.svc.cluster.local
             port:
               number: 20001
-    - match:
+
+    # Prometheus (보통 istio-system 네임스페이스, 포트 9090)
+    - name: route-to-prometheus
+      match:
         - uri:
-            prefix: /prometheus
+            prefix: '/prometheus'
       rewrite:
-        uri: /prometheus
+        uri: '/'
       route:
         - destination:
             host: prometheus.istio-system.svc.cluster.local

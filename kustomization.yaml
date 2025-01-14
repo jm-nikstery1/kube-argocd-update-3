@@ -1,0 +1,7 @@
+resources:
+  - apps/service.yaml
+  - apps/nginx-deployment.yaml
+  - apps/backend-deployment.yaml
+  - apps/frontend-deployment.yaml
+  - apps/kiali.yaml
+  - apps/prometheus.yaml

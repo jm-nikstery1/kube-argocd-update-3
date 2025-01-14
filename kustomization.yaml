@@ -5,3 +5,5 @@ resources:
   - apps/frontend-deployment.yaml
   - apps/kiali.yaml
   - apps/prometheus.yaml
+  - apps/istio-gateway.yaml
+  - apps/istio-virtualservice.yaml
